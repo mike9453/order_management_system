@@ -14,7 +14,7 @@ class User(db.Model):
     orders = db.relationship('Order', backref='user', lazy=True)
 
     #惠中0512
-    password_hash = db.Column(db.String(255), nullable=False)          # 增加密碼hash，存「密碼的雜湊值」，不存明碼
+    password_hash = db.Column(db.String(255), nullable=True)          # 增加密碼hash，存「密碼的雜湊值」，不存明碼
     role       = db.Column(db.String(20), default="user", nullable=False)  # 建立使用者分一般使用者/管理員   
 
     # ------- 密碼雜湊工具 ------- #設定的密碼會加密，跑安全機制，防止密碼洩漏
@@ -57,3 +57,14 @@ class Product(db.Model):
             "created_at": self.created_at.isoformat()
         }
 #惠中0513惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中
+
+
+class Payment(db.Model):
+    __tablename__ = 'payments'
+    id          = db.Column(db.Integer, primary_key=True)
+    order_id    = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
+    status      = db.Column(db.String(20), default='initiated')   # initiated / success / failed
+    amount      = db.Column(db.Float, nullable=False)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
+
+    order = db.relationship('Order', backref='payment', uselist=False)
