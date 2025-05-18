@@ -8,4 +8,4 @@ venv/
 .idea/
 # data / migrations
 *.sqlite3
-migrations/
+
