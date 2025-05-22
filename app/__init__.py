@@ -40,7 +40,7 @@ def create_app():
     from app.routes.main   import bp_main
     from app.routes.users  import bp_users
     from app.routes.orders import bp_orders
-    from app.practice.routes import bp_practice
+
     from app.routes.auth import bp_auth #惠中0513
     from app.routes.products import bp_prod #惠中0513
     from app.routes.payments import bp_pay#惠中0513
@@ -49,7 +49,7 @@ def create_app():
     app.register_blueprint(bp_main)
     app.register_blueprint(bp_users)
     app.register_blueprint(bp_orders)
-    app.register_blueprint(bp_practice)
+
     app.register_blueprint(bp_auth)#惠中0513
     app.register_blueprint(bp_prod)#惠中0513
     app.register_blueprint(bp_pay)#惠中0513

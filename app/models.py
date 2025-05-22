@@ -35,7 +35,15 @@ class Order(db.Model):
     price = db.Column(db.Float, nullable=False)         # 單價，不可為空
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
         # 建立訂單的時間，預設為當下 UTC 時間
-
+   
+    # 用於多商品/總價計算，原單品欄位可退役或保留做相容
+    status     = db.Column(db.String(20), default='pending', nullable=False)  # pending/paid/cancelled
+    total_price= db.Column(db.Float,      nullable=False, default=0.0)
+    
+    @property
+    def compute_total(self):
+        # 若日後改成多商品，可改為 sum(item.quantity*item.unit_price)
+        return self.total_price
 
 #惠中0513惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中惠中
 class Product(db.Model):

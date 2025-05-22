@@ -1,8 +1,9 @@
 import os
 
 class Config:
-    # MySQL 資料庫連線字串：
-    # 格式：mysql+pymysql://<使用者名稱>:<密碼>@<主機>/<資料庫名稱>
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://jenny:1234@localhost/order_management'
-    # 關閉 SQLAlchemy 的修改追蹤功能，可減少不必要的記憶體與效能負擔
+    # 從環境變數讀取，容器內會注入 DATABASE_URL 指向 db:3306
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "DATABASE_URL",
+        "mysql+pymysql://jenny:1234@localhost/my_db"
+    )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
