@@ -27,7 +27,7 @@ swagger_config = {
 }
 
 template = {
-    "openapi": "3.0.2",
+    "swagger": "2.0",
     "info": {
         "title": "Order Management API",
         "version": "1.0",
@@ -55,6 +55,68 @@ template = {
                 }
             },
             # 你可以在這裡繼續加 Products、Orders、Payment… 等 schema
+
+            "Product": {
+                "type": "object",
+                "properties": {
+                    "id":         { "type": "integer", "example": 1 },
+                    "name":       { "type": "string",  "example": "T-shirt" },
+                    "price":      { "type": "number",  "format": "float", "example": 299.99 },
+                    "stock":      { "type": "integer", "example": 100 },
+                    "desc":       { "type": "string",  "example": "純棉短袖" },
+                    "created_at": { "type": "string",  "format": "date-time" }
+                }
+            },
+            "ProductInput": {
+                "type": "object",
+                "required": ["name","price"],
+                "properties": {
+                    "name":  { "type": "string" },
+                    "price": { "type": "number", "format": "float" },
+                    "stock": { "type": "integer" },
+                    "desc":  { "type": "string" }
+                }
+            },
+            "Order": {
+                "type": "object",
+                "properties": {
+                    "id":          { "type": "integer", "example": 1 },
+                    "user_id":     { "type": "integer", "example": 1 },
+                    "item":        { "type": "string",  "example": "Widget" },
+                    "quantity":    { "type": "integer", "example": 3 },
+                    "price":       { "type": "number",  "format": "float", "example": 19.99 },
+                    "status":      { "type": "string",  "example": "pending" },
+                    "total_price": { "type": "number",  "format": "float", "example": 59.97 },
+                    "created_at":  { "type": "string",  "format": "date-time" }
+                }
+            },
+            "OrderInput": {
+                "type": "object",
+                "required": ["user_id","item","quantity","price"],
+                "properties": {
+                    "user_id":  { "type": "integer" },
+                    "item":     { "type": "string" },
+                    "quantity": { "type": "integer" },
+                    "price":    { "type": "number", "format": "float" }
+                }
+            },
+            "Payment": {
+                "type": "object",
+                "properties": {
+                    "id":         { "type": "integer", "example": 1 },
+                    "order_id":   { "type": "integer", "example": 42 },
+                    "amount":     { "type": "number",  "format": "float", "example": 59.97 },
+                    "status":     { "type": "string",  "example": "success" },
+                    "created_at": { "type": "string",  "format": "date-time" }
+                }
+            }
+                        
+
+
+
+
+
+            
         },
         "securitySchemes": {
             "bearerAuth": {
@@ -104,7 +166,7 @@ def create_app():
 
     # 啟用 Swagger
     from flasgger import Swagger
-    Swagger(app)
+    Swagger(app, config=swagger_config, template=template)
 
     # 載入並註冊各 Blueprint
     from app.routes.main   import bp_main

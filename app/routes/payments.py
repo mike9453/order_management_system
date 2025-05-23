@@ -9,6 +9,36 @@ bp_pay = Blueprint('payments', __name__, url_prefix='/payments')
 @bp_pay.route('/<int:order_id>', methods=['POST'])
 @jwt_required()
 def pay_order(order_id):
+
+    """
+    付款訂單
+    ---
+    tags:
+      - Payments
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: order_id
+        schema:
+          type: integer
+        required: true
+        description: 訂單 ID
+    responses:
+      201:
+        description: 付款成功
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      400:
+        description: 訂單狀態不允許付款
+      403:
+        description: 不是該用戶的訂單
+      404:
+        description: 找不到訂單
+    """
+    
     uid = int(get_jwt_identity())
     order = Order.query.get_or_404(order_id)
     if order.user_id != uid:

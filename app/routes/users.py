@@ -16,19 +16,19 @@ def create_user():
     ---
     tags:
       - Users
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UserInput'
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/components/schemas/UserInput'
     responses:
       201:
         description: 使用者建立成功
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
+        schema:
+          $ref: '#/components/schemas/User'
       400:
         description: 欄位驗證失敗
     """

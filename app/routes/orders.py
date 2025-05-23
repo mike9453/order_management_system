@@ -11,35 +11,37 @@ def create_order():
     ---
     tags:
       - Orders
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - user_id
-              - item
-              - quantity
-              - price
-            properties:
-              user_id:
-                type: integer
-                example: 1
-                description: 使用者 ID (User ID)
-              item:
-                type: string
-                example: "Widget"
-                description: 商品名稱 (Item name)
-              quantity:
-                type: integer
-                example: 3
-                description: 數量 (Quantity)
-              price:
-                type: number
-                format: float
-                example: 19.99
-                description: 單價 (Price per unit)
+    consumes:
+      - application/json
+    parameters:
+      - in: body
+        name: order
+        required: true
+        schema:
+          type: object
+          required:
+            - user_id
+            - item
+            - quantity
+            - price
+          properties:
+            user_id:
+              type: integer
+              example: 1
+              description: 使用者 ID
+            item:
+              type: string
+              example: "Widget"
+              description: 商品名稱
+            quantity:
+              type: integer
+              example: 3
+              description: 數量
+            price:
+              type: number
+              format: float
+              example: 19.99
+              description: 單價
     responses:
       201:
         description: 訂單建立成功 (Order created successfully)
@@ -48,6 +50,7 @@ def create_order():
       404:
         description: 找不到指定使用者 (Specified user not found)
     """
+    
     data = request.get_json() or {}
     user_id = data.get('user_id')
     item = data.get('item')
