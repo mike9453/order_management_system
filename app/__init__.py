@@ -2,13 +2,77 @@
 from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
-from config import Config
+from config import DevelopmentConfig, TestingConfig, ProductionConfig
 from marshmallow import ValidationError
 from flask_migrate import Migrate#惠中0512
 from flask_jwt_extended import JWTManager#惠中0512
+import os
+
 
 # 建立 SQLAlchemy 物件，待 create_app 時初始化
 db = SQLAlchemy()
+
+# ------------------ Swagger 全域設定 ------------------
+swagger_config = {
+    "headers": [],
+    "specs": [{
+        "endpoint": "apispec",
+        "route": "/apispec.json",
+        "rule_filter": lambda rule: True,   # 所有路由都納入
+        "model_filter": lambda tag: True    # 所有 component 都納入
+    }],
+    "static_url_path": "/flasgger_static",
+    "swagger_ui": True,
+    "specs_route": "/apidocs/"
+}
+
+template = {
+    "openapi": "3.0.2",
+    "info": {
+        "title": "Order Management API",
+        "version": "1.0",
+        "description": "展示後端開發技能的訂單管理系統 API"
+    },
+    "servers": [
+        {"url": "http://localhost:5000", "description": "Development"}
+    ],
+    "components": {
+        "schemas": {
+            "User": {
+                "type": "object",
+                "properties": {
+                    "id":       {"type": "integer", "example": 1},
+                    "username": {"type": "string",  "example": "alice"},
+                    "email":    {"type": "string",  "format": "email", "example": "alice@example.com"}
+                }
+            },
+            "UserInput": {
+                "type": "object",
+                "required": ["username", "email"],
+                "properties": {
+                    "username": {"type": "string", "example": "alice"},
+                    "email":    {"type": "string", "format": "email", "example": "alice@example.com"}
+                }
+            },
+            # 你可以在這裡繼續加 Products、Orders、Payment… 等 schema
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "輸入 'Bearer YOUR_TOKEN'"
+            }
+        }
+    },
+    "security": [
+        {"bearerAuth": []}
+    ]
+}
+# -------------------------------------------------------
+
+
+
 
 def create_app():
     """
@@ -20,7 +84,13 @@ def create_app():
     - 註冊全域錯誤處理
     """
     app = Flask(__name__)
-    app.config.from_object(Config)
+    env = os.getenv("FLASK_ENV", "development")
+    cfg = {
+        "development": DevelopmentConfig,
+        "testing":    TestingConfig,
+        "production": ProductionConfig
+    }[env]
+    app.config.from_object(cfg)
 
     # 惠中0512--- 新增開始 ---
     app.config["JWT_SECRET_KEY"] = "replace-this-with-env"  # 之後改成環境變數

@@ -70,16 +70,18 @@ Docker 與 Nginx 的部署流程
 
 Git 版本管理紀錄
 
+
+###############################################
 pip freeze > requirements.txt
 
 
-git clone order_management_system
+###############################################
 
 python3 -m venv venv
 
 source venv/bin/activate
 
-
+###########################################ˇˇ
 
 pip install \
 flask \
@@ -120,6 +122,21 @@ echo $TOKEN
 
 swaggerAPI測試:
 http://127.0.0.1:5000/apidocs/
+
+
+###########################安裝套件#################################
+
+pip install --upgrade pip           # （可選）先把 pip 更新到最新版
+pip install -r requirements.txt     # 安裝所有列在裡面的套件
+
+#############################DOCEKR##################################
+
+sudo usermod -aG docker $USER 以有權限的使用者登入
+
+newgrp docker 重登 
+
+
+docker-compose up -d --build 建置Docker
 
 
 ///////////////////////////////////MySQL Docker 0522////////////////////////////////////////////////////
@@ -164,7 +181,7 @@ ADMIN_TOKEN=$(
 echo $ADMIN_TOKEN
 
 
-#############3CRUD測試
+#############3CRUD測試###################################
 
 @@@@列出所有商品
 curl http://localhost:5000/products
@@ -201,3 +218,37 @@ curl -X PUT http://localhost:5000/products/1 \
 curl -X DELETE http://localhost:5000/products/1 \
   -H "Authorization: Bearer $ADMIN_TOKEN"
 # 204 無主體回應
+
+
+
+
+實作建議
+後端
+
+保持現有 Flask + SQLAlchemy + JWT 架構。
+
+用 Flasgger 或 FastAPI 寫好完整 OpenAPI 文件，包含所有 CRUD、認證流程。
+
+前端
+
+選一個你比較熟的框架（React.js 建議搭配 Create-React-App + TypeScript）。
+
+用 axios 或 typescript-axios（由 OpenAPI Generator 產生）呼叫後端 API。
+
+實作：商品列表 / 詳細 / 購物車 / 結帳 / 登入／註冊 5 大頁面。
+
+部署
+
+後端打包成 Docker image，部署到 Heroku/AWS/GCP。
+
+前端打包成靜態網站，部署到 Netlify/Vercel。
+
+README
+
+清楚寫出：專案架構圖、API 說明、運行步驟、環境變數、Demo 截圖。
+
+加上 C4 架構圖、ER 圖、時序圖，凸顯你對軟體工程流程的重視。
+
+總結：
+若時間允許，強烈建議採「API-First + 獨立前端 SPA」方案，既能展示你深厚的後端實力，也能加分你的前端能力與完整交付流程，讓面試官一看就知道你具備現代全棧開發實戰經驗
+

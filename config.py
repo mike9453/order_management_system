@@ -1,9 +1,21 @@
+# config.py
 import os
 
-class Config:
-    # 從環境變數讀取，容器內會注入 DATABASE_URL 指向 db:3306
+class BaseConfig:
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "replace-me")
+
+class DevelopmentConfig(BaseConfig):
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "DATABASE_URL",
         "mysql+pymysql://jenny:1234@localhost/my_db"
     )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+class TestingConfig(BaseConfig):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+
+class ProductionConfig(BaseConfig):
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
