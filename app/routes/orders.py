@@ -128,35 +128,38 @@ def update_order(order_id):
     ---
     tags:
       - Orders
+    consumes:
+      - application/json
     parameters:
       - in: path
         name: order_id
         required: true
         schema:
           type: integer
-        description: 訂單 ID (Order ID)
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              item:
-                type: string
-                description: 商品名稱 (Item name)
-              quantity:
-                type: integer
-                description: 數量 (Quantity)
-              price:
-                type: number
-                format: float
-                description: 單價 (Price per unit)
+        description: 訂單 ID
+      - in: body
+        name: order
+        required: true
+        schema:
+          type: object
+          properties:
+            item:
+              type: string
+              description: 新的商品名稱
+            quantity:
+              type: integer
+              description: 新的數量
+            price:
+              type: number
+              format: float
+              description: 新的單價
     responses:
       200:
-        description: 訂單更新成功 (Order updated successfully)
+        description: 訂單更新成功
+        schema:
+          $ref: '#/components/schemas/Order'
       404:
-        description: 找不到訂單 (Order not found)
+        description: 找不到訂單
     """
     o = Order.query.get_or_404(order_id, description="找不到訂單 (Order not found)")
     data = request.get_json() or {}

@@ -120,26 +120,25 @@ def update_user(user_id):
     ---
     tags:
       - Users
+    consumes:
+      - application/json
     parameters:
       - in: path
         name: user_id
+        required: true
         schema:
           type: integer
-        required: true
         description: 使用者 ID
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/UserInput'
+      - in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/components/schemas/UserInput'
     responses:
       200:
         description: 使用者更新成功
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/User'
+        schema:
+          $ref: '#/components/schemas/User'
       400:
         description: 欄位驗證錯誤
       404:

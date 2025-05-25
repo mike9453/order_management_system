@@ -277,3 +277,8 @@ README
 總結：
 若時間允許，強烈建議採「API-First + 獨立前端 SPA」方案，既能展示你深厚的後端實力，也能加分你的前端能力與完整交付流程，讓面試官一看就知道你具備現代全棧開發實戰經驗
 
+########################git push#############################3
+git add .
+git commit -m "0525"
+git push -u origin feature/your-branch
+git push
