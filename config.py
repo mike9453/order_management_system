@@ -1,8 +1,21 @@
+# config.py
 import os
 
-class Config:
-    # MySQL 資料庫連線字串：
-    # 格式：mysql+pymysql://<使用者名稱>:<密碼>@<主機>/<資料庫名稱>
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://jenny:1234@localhost/order_management'
-    # 關閉 SQLAlchemy 的修改追蹤功能，可減少不必要的記憶體與效能負擔
+class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "replace-me")
+
+class DevelopmentConfig(BaseConfig):
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = os.getenv(
+        "DATABASE_URL",
+        "mysql+pymysql://jenny:1234@localhost/my_db"
+    )
+
+class TestingConfig(BaseConfig):
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
+
+class ProductionConfig(BaseConfig):
+    DEBUG = False
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
