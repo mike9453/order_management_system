@@ -1,13 +1,9 @@
-/*
-  src/components/Navbar.jsx
-  ----
-  導航列：顯示主要路由與使用者資訊，包含登出按鈕
-*/
+// src/components/Navbar.jsx
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../api";
 
-export default function Navbar() {
+export default function Navbar({ onLogout }) {
   const [userName, setUserName] = useState("");
   const navigate = useNavigate();
 
@@ -23,9 +19,11 @@ export default function Navbar() {
     fetchName();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
+  const handleLogoutClick = () => {
+    // 1. 清除 localStorage 裡的 token，並更新 AppRouter 的 state
+    onLogout();
+    // 2. 重新導向回首頁 (HomePage)，路徑 "/"
+    navigate("/", { replace: true });
   };
 
   return (
@@ -61,7 +59,10 @@ export default function Navbar() {
             </li>
           </ul>
           <span className="navbar-text me-3">你好，{userName}</span>
-          <button className="btn btn-outline-secondary" onClick={handleLogout}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={handleLogoutClick}
+          >
             登出
           </button>
         </div>

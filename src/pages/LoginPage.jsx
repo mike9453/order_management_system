@@ -1,27 +1,32 @@
-/*
-  src/pages/LoginPage.jsx
-  ----
-  會員登入頁面：輸入 username/password
-*/
+// src/pages/LoginPage.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../api";
 
-export default function LoginPage() {
+export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // 如果 localStorage 裡已經有 token，直接跳去 /products
   useEffect(() => {
-    if (localStorage.getItem("token")) navigate("/products");
+    if (localStorage.getItem("token")) {
+      navigate("/products", { replace: true });
+    }
   }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // 呼叫後端登入 API，成功的話拿到 access_token
       const res = await api.post("/auth/login", { username, password });
       localStorage.setItem("token", res.data.access_token);
-      navigate("/products");
+
+      // 通知 AppRouter 更新 token state
+      onLogin();
+
+      // 再導到 /products
+      navigate("/products", { replace: true });
     } catch (err) {
       console.error(err);
       const status = err.response?.status;
@@ -58,7 +63,7 @@ export default function LoginPage() {
           登入
         </button>
         <p className="mt-3 text-center">
-          還沒帳號？<Link to="/register"> 立即註冊</Link>
+          還沒帳號？<Link to="/register">立即註冊</Link>
         </p>
       </form>
     </div>
