@@ -282,3 +282,24 @@ git add .
 git commit -m "0525"
 git push -u origin feature/your-branch
 git push
+
+
+
+######################migration 要在docker建出來的資料庫中進行############
+
+
+docker exec -it oms_app bash
+
+
+echo $DATABASE_URL
+
+ls
+# 你應該能看到 app 程式碼與 migrations 目錄
+
+flask db migrate -m "Add customer, amount, status, date, remark to Order"
+flask db upgrade
+
+
+exit
+
+############################################################################
