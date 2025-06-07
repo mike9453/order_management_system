@@ -19,4 +19,6 @@ ENV FLASK_APP=run.py \
 EXPOSE 5000
 
 # 7. 啟動指令
-CMD ["flask", "run", "--host=0.0.0.0"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
