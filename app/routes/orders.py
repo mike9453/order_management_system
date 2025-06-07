@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, abort
 from app import db
 from app.models import Order
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt  # # 修改：匯入 get_jwt
 
 bp_orders = Blueprint('orders', __name__, url_prefix='/orders')
 
@@ -42,35 +42,46 @@ def create_order():
 
 @bp_orders.route('', methods=['GET'])
 @jwt_required()
-def get_orders():
+def list_orders():
     """
-    取得目前使用者所有訂單 (List all orders for current user)
+    取得訂單列表 (List orders)
+    admin: 看所有；user: 只看自己
     """
-    user_id = int(get_jwt_identity())
-    orders = Order.query.filter_by(user_id=user_id).all()
-    return jsonify([o.to_dict() for o in orders]), 200
+    claims = get_jwt()                    # # 修改：取得 JWT claims
+    uid = int(get_jwt_identity())
+    if claims.get("role") == "admin":     # # 修改：admin 看所有
+        qs = Order.query.order_by(Order.created_at)
+    else:
+        qs = Order.query.filter_by(user_id=uid).order_by(Order.created_at)  # # 修改：user 看自己
+    return jsonify([o.to_dict() for o in qs]), 200
 
 @bp_orders.route('/<string:order_id>', methods=['GET'])
 @jwt_required()
 def get_order(order_id):
     """
     取得單一訂單 (Retrieve an order by orderId)
+    admin: 任意；user: 自己
     """
-    user_id = int(get_jwt_identity())
-    o = Order.query.filter_by(order_id=order_id, user_id=user_id).first()
+    claims = get_jwt()
+    uid = int(get_jwt_identity())
+    o = Order.query.filter_by(order_id=order_id).first()
     if not o:
         abort(404, description="找不到訂單")
+    if claims.get("role") != "admin" and o.user_id != uid:  # # 修改：非 admin 禁止存取他人
+        abort(403, description="沒有權限存取此訂單")
     return jsonify(o.to_dict()), 200
 
 @bp_orders.route('/<string:order_id>', methods=['PUT'])
 @jwt_required()
 def update_order(order_id):
     """
-    更新訂單資料 (Update an existing order)
+    更新訂單 (Update an existing order)
+    admin: 任意；user: 自己
     """
-    user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    uid = int(get_jwt_identity())
     o = Order.query.filter_by(order_id=order_id).first()
-    if not o or o.user_id != user_id:
+    if not o or (claims.get("role") != "admin" and o.user_id != uid):  # # 修改：檢查權限
         abort(404, description="找不到或無權限修改此訂單")
 
     data = request.get_json() or {}
@@ -93,10 +104,12 @@ def update_order(order_id):
 def delete_order(order_id):
     """
     刪除訂單 (Delete an order)
+    admin: 任意；user: 自己
     """
-    user_id = int(get_jwt_identity())
+    claims = get_jwt()
+    uid = int(get_jwt_identity())
     o = Order.query.filter_by(order_id=order_id).first()
-    if not o or o.user_id != user_id:
+    if not o or (claims.get("role") != "admin" and o.user_id != uid):  # # 修改：檢查權限
         abort(404, description="找不到或無權限刪除此訂單")
     db.session.delete(o)
     db.session.commit()

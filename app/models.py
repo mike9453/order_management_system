@@ -11,6 +11,7 @@ class User(db.Model):
     email         = db.Column(db.String(120), unique=True, nullable=False)
     created_at    = db.Column(db.DateTime, default=datetime.utcnow)
     orders        = db.relationship('Order', backref='user', lazy=True)
+    products      = db.relationship('Product', backref='user', lazy=True)   # # 修改：新增與 Product 的關聯
     password_hash = db.Column(db.String(255), nullable=True)
     role          = db.Column(db.String(20), default="user", nullable=False)
 
@@ -35,32 +36,36 @@ class Order(db.Model):
 
     def to_dict(self):
         return {
-            "orderId": self.order_id,
-            "customer": self.customer,
-            "amount": self.amount,
-            "status": self.status,
-            "date": self.date,
-            "remark": self.remark,
+            "orderId":   self.order_id,
+            "customer":  self.customer,
+            "amount":    self.amount,
+            "status":    self.status,
+            "date":      self.date,
+            "remark":    self.remark,
+            "createdAt": self.created_at.isoformat(),
+            "createdBy": self.user.username                            # # 修改：回傳建立者 username
         }
 
 
 class Product(db.Model):
     __tablename__ = 'products'
-    id         = db.Column(db.Integer, primary_key=True)
-    name       = db.Column(db.String(120), nullable=False, unique=True)
-    price      = db.Column(db.Float, nullable=False)
-    stock      = db.Column(db.Integer, default=0)
-    desc       = db.Column(db.Text)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    id          = db.Column(db.Integer, primary_key=True)
+    user_id     = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # # 修改：新增 user_id 欄位
+    name        = db.Column(db.String(120), nullable=False, unique=True)
+    price       = db.Column(db.Float,   nullable=False)
+    stock       = db.Column(db.Integer, default=0)
+    desc        = db.Column(db.Text)
+    created_at  = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
         return {
-            "id": self.id,
-            "name": self.name,
-            "price": self.price,
-            "stock": self.stock,
-            "desc": self.desc,
-            "created_at": self.created_at.isoformat()
+            "id":         self.id,
+            "name":       self.name,
+            "price":      self.price,
+            "stock":      self.stock,
+            "desc":       self.desc,
+            "createdAt":  self.created_at.isoformat(),
+            "createdBy":  self.user.username                            # # 修改：回傳建立者 username
         }
 
 
