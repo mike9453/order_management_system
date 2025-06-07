@@ -1,5 +1,6 @@
 # app/__init__.py
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
 from config import DevelopmentConfig, TestingConfig, ProductionConfig
@@ -185,6 +186,11 @@ def create_app():
     app.register_blueprint(bp_auth)#惠中0513
     app.register_blueprint(bp_prod)#惠中0513
     app.register_blueprint(bp_pay)#惠中0513
+
+
+
+    CORS(app, resources={r"/*": {"origins": "*"}})
+
 
     # 處理 Marshmallow 驗證錯誤 → 400
     @app.errorhandler(ValidationError)
