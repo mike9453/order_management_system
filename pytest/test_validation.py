@@ -31,3 +31,24 @@ def test_user_validation_bad_email_format(client):
     assert resp.status_code == 400
     err = resp.get_json()
     assert "email" in err.get("errors", {})
+
+
+def test_user_role_validation(client):
+    """角色欄位驗證與預設值"""
+    # 合法角色應建立成功
+    resp = client.post(
+        "/users",
+        json={"username": "sell", "email": "sell@example.com", "role": "seller"}
+    )
+    assert resp.status_code == 201
+    data = resp.get_json()
+    assert data["role"] == "seller"
+
+    # 不合法的角色應回傳 400
+    resp2 = client.post(
+        "/users",
+        json={"username": "badrole", "email": "badrole@example.com", "role": "invalid"}
+    )
+    assert resp2.status_code == 400
+    err2 = resp2.get_json()
+    assert "role" in err2.get("errors", {})
